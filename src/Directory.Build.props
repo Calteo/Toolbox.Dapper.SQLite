@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <BuildVersion Condition="'$(BuildVersion)' == ''">0.1.0.0</BuildVersion>
+
+    <Version>$(BuildVersion)</Version>
+    <AssemblyVersion>$(BuildVersion)</AssemblyVersion>
+    <FileVersion>$(BuildVersion)</FileVersion>
+    <InformationalVersion>$(BuildVersion)</InformationalVersion>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,35 @@
+name: Initialize repository
+
+on:
+  push:
+    branches:
+      - main
+ 
+permissions:
+  contents: write
+  actions: write  
+  
+env:
+  PROJECT_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  Initialize:
+    if: github.repository != 'Calteo/Project.Template'
+    runs-on: windows-latest  
+    steps:
+      - uses: actions/checkout@v6
+        
+      - name: Run initialization
+        shell: pwsh
+        run: init\initialize.ps1
+
+      - name: Commit changes
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Initialize repository"
+          if ($LASTEXITCODE -eq 0) {
+              git push
+          }
