@@ -1,12 +1,11 @@
-# Project.Template
-A template for projects
+# Toolbox.Dapper.SQLite
+_Project description needs to be edited._
 
-The documentation for this project is in the doxfx_project.
+See documentation at https://Calteo.github.io/Toolbox.Dapper.SQLite/
 
-During development the docs are transformed into HTML by DoxFX and published on github pages.
+## Licences
 
-After using the template the action initialization.yml is executed 
-and changes the placeholders in the files.
+This package uses a logo from [WikiMedia](https://commons.wikimedia.org/wiki/File:Icon_tools.svg)
+under a [Creative Commons Attribution 2.5 Generic](https://creativecommons.org/licenses/by/2.5/deed.en).
+The original file was rescaled to 50x50 since the docfx does not correct scale the files.
 
-The build script has to be checked an maybe further configrations need to be done (e.g. nuget/chocolatey).
-The script has to be activated by entering the brach name at the on/push/brances, replacing \_\_never\_\_.

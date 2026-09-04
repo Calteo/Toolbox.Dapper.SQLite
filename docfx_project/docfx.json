@@ -8,7 +8,7 @@
         {
           "src": "../",
           "files": [
-            "src/{{PROJECT_NAME}}/*.csproj"
+            "src/Toolbox.Dapper.SQLite/*.csproj"
           ]
         }
       ]
