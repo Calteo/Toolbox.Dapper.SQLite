@@ -4,12 +4,17 @@ namespace Toolbox.Dapper.SQLite.Factories
 {
 	public class SqliteFactory<T> : SqlFactory<T> where T : IDatabaseModel
 	{
+		protected override string Quote(string name)
+		{
+			return $"\"{name}\"";
+		}
+
 		public override string Select(string tableName)
 		{
-			var columns = Mappings.Select(m => 
+			var columns = Mappings.Values.Select(m => 
 				{
-					if (m.Property.Name != m.ColumnName)
-						return $"{Quote(m.ColumnName)} AS {Quote(m.Property.Name)}";
+					if (m.PropertyName != m.ColumnName)
+						return $"{Quote(m.ColumnName)} AS {Quote(m.PropertyName)}";
 					else
 						return Quote(m.ColumnName);
 				});
@@ -19,7 +24,7 @@ namespace Toolbox.Dapper.SQLite.Factories
 
 		public override string Insert(string tableName)
 		{
-			var valueMappings = Mappings.Where(m => !m.IsIdentity);
+			var valueMappings = Mappings.Values.Where(m => !m.IsIdentity);
 			var columns = valueMappings.Select(m => Quote(m.ColumnName));
 			var parameters = valueMappings.Select(m => "@" + m.Property.Name);
 
@@ -34,7 +39,7 @@ namespace Toolbox.Dapper.SQLite.Factories
 
 		public override string Update(string tableName)
 		{
-			var valueMappings = Mappings.Where(m => !m.IsIdentity);
+			var valueMappings = Mappings.Values.Where(m => !m.IsIdentity);
 			var assignments = valueMappings.Select(m => $"{Quote(m.ColumnName)} = @{m.Property.Name}");
 
 			var builder = new StringBuilder();

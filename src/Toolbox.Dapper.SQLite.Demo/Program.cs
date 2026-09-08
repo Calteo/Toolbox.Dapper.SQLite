@@ -16,14 +16,8 @@ namespace Toolbox.Dapper.SQLite.Demo
 
 			foreach (var item in found)
 			{
-				Console.WriteLine($"[{item.Id}] - {item.Name} - Age {item.Age}");
+				Console.WriteLine($"[{item.Id}] - {item.Name} - Age {item.Age} - '{item.Description}'");
 			}			
-
-			if (found.Length > 2)
-			{
-				Console.WriteLine($"Deleting {found[0].Id}");
-				database.Peoples.Delete(found[0]);				
-			}
 
 			var person = new Person
 			{
@@ -37,10 +31,23 @@ namespace Toolbox.Dapper.SQLite.Demo
 			if (found.Length > 1)
 			{
 				Console.WriteLine($"Updating {found[1].Id} -> Age = 42");
+				found[1].Description = $"Updated at {DateTime.Now}";
 				found[1].Age = 42;
 				database.Peoples.Update(found[1]);
 			}
 
+			Console.WriteLine("like Updating...");
+			var aged = database.Peoples.SelectWhere($"[Description] like 'Updated %'");
+			foreach (var item in aged)
+			{
+				Console.WriteLine($"[{item.Id}] - {item.Name} - Age {item.Age} - '{item.Description}'");
+			}
+
+			if (found.Length > 2)
+			{
+				Console.WriteLine($"Deleting {found[0].Id}");
+				database.Peoples.Delete(found[0]);
+			}
 
 			database.Close();
 		}

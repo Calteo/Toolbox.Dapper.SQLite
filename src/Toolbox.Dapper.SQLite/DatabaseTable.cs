@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Text.RegularExpressions;
+using Dapper;
 using Toolbox.Dapper.SQLite.Factories;
 
 namespace Toolbox.Dapper.SQLite
@@ -6,7 +7,7 @@ namespace Toolbox.Dapper.SQLite
 	/// <summary>
 	/// Represents a database table. This class can be extended to define specific tables and their properties.
 	/// </summary>
-	public class DatabaseTable<T> : IDatabaseTable where T : IDatabaseModel
+	public partial class DatabaseTable<T> : IDatabaseTable where T : IDatabaseModel
 	{
 		/// <summary>
 		/// Create a new instance of the <see cref="DatabaseTable{T}"/> class with the specified table name.
@@ -58,20 +59,42 @@ namespace Toolbox.Dapper.SQLite
 			command = GetType().TryGetRessourceString(name);
 			if (command != null)
 				Commands[key] = command;
+			else 
+			{
+				command = Factory.Call(name, TableName);
+			}
 
 			return command;
 		}
 
 		public IEnumerable<T> Select()
 		{
-			var command = GetCommand("Select") ?? Factory.Select(TableName);
+			var command = GetCommand(nameof(Select))
+				?? throw new InvalidOperationException($"No command found for '{nameof(Select)}'.");
+
+			using var connection = Database.GetConnection(true);
+			return connection.Query<T>(command);
+		}
+		
+		public IEnumerable<T> SelectWhere(string where, object? parameters = null)
+		{
+			var command = GetCommand(nameof(Select))
+				?? throw new InvalidOperationException($"No command found for '{nameof(Select)}'.");
+
+			var clause = Factory.ReplaceProperties(where);
+
+			command += " WHERE " + clause;
+
 			using var connection = Database.GetConnection(true);
 			return connection.Query<T>(command);
 		}
 
+
 		public void Insert(T item)
 		{
-			var command = GetCommand("Insert") ?? Factory.Insert(TableName);
+			var command = GetCommand(nameof(Insert))
+				?? throw new InvalidOperationException($"No command found for '{nameof(Insert)}'.");
+
 			using var connection = Database.GetConnection(true);
 			var identity = connection.ExecuteScalar<long>(command, item);
 			item.Id = identity;
@@ -79,14 +102,18 @@ namespace Toolbox.Dapper.SQLite
 
 		public void Update(T item)
 		{
-			var command = GetCommand("Update") ?? Factory.Update(TableName);
+			var command = GetCommand(nameof(Update))
+				?? throw new InvalidOperationException($"No command found for '{nameof(Update)}'.");
+
 			using var connection = Database.GetConnection(true);
 			var affected = connection.Execute(command, item);
 		}
 
 		public void Delete(T item)
 		{
-			var command = GetCommand("Delete") ?? Factory.Delete(TableName);
+			var command = GetCommand(nameof(Delete))
+				?? throw new InvalidOperationException($"No command found for '{nameof(Delete)}'.");
+
 			using var connection = Database.GetConnection(true);
 			var affected = connection.ExecuteScalar<long>(command, item);
 		}

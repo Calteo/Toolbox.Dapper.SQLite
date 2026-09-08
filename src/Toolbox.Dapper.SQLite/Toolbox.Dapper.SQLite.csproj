@@ -4,7 +4,30 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Toolbox Dapper SQLite</Title>
+    <Authors>Calteo</Authors>
+    <RepositoryUrl>https://github.com/Calteo/Toolbox.Dapper.SQLite</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Calteo/Toolbox.Dapper.SQLite</PackageProjectUrl>
+    <PackageIcon>toolbox.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Calteo 2026</Copyright>
+    <Description>Wapper for Dapper using SQLite</Description>
+    <PackageTags>Dapper SQLite</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\images\toolbox.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.79" />
