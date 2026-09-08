@@ -86,7 +86,7 @@ namespace Toolbox.Dapper.SQLite
 			command += " WHERE " + clause;
 
 			using var connection = Database.GetConnection(true);
-			return connection.Query<T>(command);
+			return connection.Query<T>(command, parameters);
 		}
 
 
@@ -115,7 +115,7 @@ namespace Toolbox.Dapper.SQLite
 				?? throw new InvalidOperationException($"No command found for '{nameof(Delete)}'.");
 
 			using var connection = Database.GetConnection(true);
-			var affected = connection.ExecuteScalar<long>(command, item);
+			var affected = connection.Execute(command, item);
 		}
 	}
 }

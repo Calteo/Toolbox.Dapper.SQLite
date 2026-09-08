@@ -1,0 +1,23 @@
+﻿<Project Sdk="MSTest.Sdk/4.0.2">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseVSTest>true</UseVSTest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Test.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Access\TestDatabase.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Toolbox.Dapper.SQLite\Toolbox.Dapper.SQLite.csproj" />
+  </ItemGroup>
+
+</Project>

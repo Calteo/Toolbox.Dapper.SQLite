@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Toolbox.Dapper.SQLite.Demo/Toolbox.Dapper.SQLite.Demo.csproj" Id="76ebd675-046b-45c2-88b0-aeedab851ddf" />
+  <Project Path="Toolbox.Dapper.SQLite.Test/Toolbox.Dapper.SQLite.Test.csproj" Id="9a507ccf-cf20-49bf-9826-637b4c3c89ad" />
   <Project Path="Toolbox.Dapper.SQLite/Toolbox.Dapper.SQLite.csproj" Id="40fca5b0-1bce-474a-a2ff-0f4fb5f8ff10" />
 </Solution>

@@ -7,7 +7,7 @@ namespace Toolbox.Dapper.SQLite
 	/// <summary>
 	/// Represents a database connection and provides methods for executing queries and commands against the database.
 	/// </summary>
-	public class Database
+	public class Database : IDisposable
 	{
 		/// <summary>
 		/// Create new instance of <see cref="Database"/>.
@@ -50,7 +50,7 @@ namespace Toolbox.Dapper.SQLite
 		/// This dictionary maps the type of the table to its corresponding IDatabaseTable instance. 
 		/// </summary>
 		private Dictionary<Type, IDatabaseTable> _tables = new Dictionary<Type, IDatabaseTable>();
-
+		
 		public T AddTable<T>(T? table = default) where T : IDatabaseTable
 		{
 			if (table == null) 
@@ -79,8 +79,7 @@ namespace Toolbox.Dapper.SQLite
 		{
 			Connection.Open();
 
-			var exists = Connection.ExecuteScalar<bool>("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'Version'");
-			_version = exists ? Upgrade() : Create();
+			_version = ExistsVersionTable() ? Upgrade() : Create();
 
 			foreach (var table in _tables.Values) table.Open();
 		}
@@ -94,6 +93,11 @@ namespace Toolbox.Dapper.SQLite
 			foreach (var table in _tables.Values) table.Close();
 			Connection.Close();
 			_version = null;
+		}
+
+		private bool ExistsVersionTable()
+		{
+			return Connection.ExecuteScalar<bool>("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'Version'");
 		}
 
 		private VersionInfo? Create()
@@ -119,9 +123,17 @@ namespace Toolbox.Dapper.SQLite
 				Comment = "Initial version"
 			};
 
+			if (!ExistsVersionTable())
+				CreateVersionTable();
+
 			Connection.Execute("INSERT INTO Version (Id, ChangedAt, Comment) VALUES (@Id, @ChangedAt, @Comment)", version);
 
 			return version;
+		}
+
+		private void CreateVersionTable()
+		{
+			Connection.Execute("CREATE TABLE Version (Id INTEGER NOT NULL, ChangedAt TEXT NOT NULL, Comment TEXT NOT NULL, PRIMARY KEY(Id))");
 		}
 
 		private string ExtractSchema(SqliteConnection connection)
@@ -264,5 +276,38 @@ namespace Toolbox.Dapper.SQLite
 			public DateTime ChangedAt { get; internal set; }
 			public string Comment { get; internal set; } = "";	
 		}
+
+		#region IDisposable
+		private bool disposed;
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposed)
+			{
+				if (disposing)
+				{
+					Connection.Close();
+					Connection.Dispose();
+				}
+
+				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+				// TODO: set large fields to null
+				disposed = true;
+			}
+		}
+
+		// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+		// ~Database()
+		// {
+		//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		//     Dispose(disposing: false);
+		// }
+
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+		#endregion
 	}
 }
