@@ -34,10 +34,33 @@ namespace Toolbox.Dapper.SQLite.Test
 
 			Assert.IsNotNull(cut.Version);
 			Assert.AreEqual(1, cut.Version.Id);
+			Assert.IsTrue(cut.CreateCalled);
 
 			cut.Close();
 			Assert.Throws<InvalidOperationException>(() => cut.Version);
 		}
+
+		[TestMethod]
+		public void ReOpenDatabase()
+		{
+			using (var db = new TestDatabase(_databaseFile))
+			{
+				db.Open();
+				db.Close();
+			}
+
+			using var cut = new TestDatabase(_databaseFile);
+			cut.Open();
+
+			Assert.IsNotNull(cut.Version);
+			Assert.AreEqual(1, cut.Version.Id);
+			Assert.IsFalse(cut.CreateCalled);
+
+			cut.Close();
+			Assert.Throws<InvalidOperationException>(() => cut.Version);
+		}
+
+
 
 		[TestMethod]
 		public void InsertSelectUpdateDelete()

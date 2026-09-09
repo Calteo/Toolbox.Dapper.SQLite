@@ -100,7 +100,13 @@ namespace Toolbox.Dapper.SQLite
 			return Connection.ExecuteScalar<bool>("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'Version'");
 		}
 
-		private VersionInfo? Create()
+		/// <summary>
+		/// Creates the database schema
+		/// </summary>
+		/// <returns>
+		/// The current <see cref="VersionInfo"/>.
+		/// </returns>
+		private VersionInfo Create()
 		{
 			using var stream = GetType().GetRessourceStream(GetType().Name + ".db");
 			var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.db");
@@ -128,7 +134,17 @@ namespace Toolbox.Dapper.SQLite
 
 			Connection.Execute("INSERT INTO Version (Id, ChangedAt, Comment) VALUES (@Id, @ChangedAt, @Comment)", version);
 
+			Create(version);
+
 			return version;
+		}
+
+		/// <summary>
+		/// Override to implement custom initialization of datebase.
+		/// </summary>
+		/// <param name="version"></param>
+		protected virtual void Create(VersionInfo version)
+		{
 		}
 
 		private void CreateVersionTable()

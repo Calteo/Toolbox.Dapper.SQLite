@@ -8,5 +8,13 @@
 		}
 
 		public PeopleTable Peoples { get; }
+
+		public bool CreateCalled { get; private set; }
+		protected override void Create(VersionInfo version)
+		{
+			base.Create(version);
+
+			CreateCalled = true;
+		}
 	}
 }
