@@ -1,4 +1,7 @@
-﻿namespace Toolbox.Dapper.SQLite.Test.Access
+﻿using System.Diagnostics;
+using Dapper;
+
+namespace Toolbox.Dapper.SQLite.Test.Access
 {
 	internal class TestDatabase : Database
 	{		
@@ -15,6 +18,16 @@
 			base.Create(version);
 
 			CreateCalled = true;
+
+			using var connection = GetConnection();
+
+			Trace.WriteLine("SCHEMA");
+			var schema = connection.Query("SELECT * FROM sqlite_schema");
+			foreach (var row in schema)
+			{
+				Trace.WriteLine($"{row.type}/{row.name}/{row.tbl_name}");
+			}
+
 		}
 	}
 }

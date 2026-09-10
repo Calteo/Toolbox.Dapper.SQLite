@@ -31,7 +31,12 @@ namespace Toolbox.Dapper.SQLite
 
 		private SqliteConnection Connection { get; } 
 
-		internal SqliteConnection GetConnection(bool open = false)
+		/// <summary>
+		/// Get a connection
+		/// </summary>
+		/// <param name="open"></param>
+		/// <returns></returns>
+		protected internal SqliteConnection GetConnection(bool open = false)
 		{
 			var connection = new SqliteConnection($"Data Source={Filename}");
 			if (open) connection.Open(); 
