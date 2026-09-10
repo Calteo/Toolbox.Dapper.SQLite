@@ -121,6 +121,7 @@ namespace Toolbox.Dapper.SQLite
 			{
 				Trace.WriteLine($"copy template database ({stream.Length} bytes) to {path}");
 				stream.CopyToAsync(file);
+				file.Flush();
 			}
 
 			using var connection = new SqliteConnection($"Data Source={path};Mode=ReadOnly;");
@@ -167,6 +168,13 @@ namespace Toolbox.Dapper.SQLite
 		private string ExtractSchema(SqliteConnection connection)
 		{
 			var script = new StringBuilder();
+
+			Trace.WriteLine("TEMPLATE SCHEMA");
+			var schema = connection.Query("SELECT * FROM sqlite_schema");
+			foreach (var row in schema)
+			{
+				Trace.WriteLine($"{row.type}/{row.name}/{row.tbl_name}");
+			}
 
 			// -----------------------------------------------------------------
 			// PRAGMA settings
@@ -269,8 +277,8 @@ namespace Toolbox.Dapper.SQLite
 			}
 
 			script.AppendLine("COMMIT;");
-
-			Trace.WriteLine("EXTRACT SCHEMA");
+			 
+			Trace.WriteLine($"EXTRACT SCHEMA from {connection.ConnectionString}");
 			Trace.WriteLine(script.ToString());
 			Trace.WriteLine("END SCHEMA");
 
