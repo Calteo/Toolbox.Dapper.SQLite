@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Toolbox.Dapper.SQLite.Test.Access;
 
@@ -14,7 +15,9 @@ namespace Toolbox.Dapper.SQLite.Test
 		{
 			_databaseFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.db");
 
-			var database = new TestDatabase(_databaseFile);		
+			var database = new TestDatabase(_databaseFile);
+
+			Trace.WriteLine($"Init database {_databaseFile}");
 		}
 
 		[TestCleanup]
@@ -30,7 +33,10 @@ namespace Toolbox.Dapper.SQLite.Test
 		public void OpenCloseDatabase()
 		{
 			using var cut = new TestDatabase(_databaseFile);
+			
 			cut.Open();
+
+			Trace.WriteLine($"Version: {cut.Version.Id} - {cut.Version.Comment} at {cut.Version.ChangedAt}");
 
 			Assert.IsNotNull(cut.Version);
 			Assert.AreEqual(1, cut.Version.Id);
