@@ -119,6 +119,7 @@ namespace Toolbox.Dapper.SQLite
 
 			using (var file = File.Create(path))
 			{
+				Trace.WriteLine($"copy template database ({stream.Length} bytes) to {path}");
 				stream.CopyToAsync(file);
 			}
 
@@ -126,6 +127,11 @@ namespace Toolbox.Dapper.SQLite
 			connection.Open();
 
 			var createScript = ExtractSchema(connection);
+
+			connection.Close();
+			SqliteConnection.ClearPool(connection);
+			File.Delete(path);
+
 			var affected = Connection.Execute(createScript);
 
 			var version = new VersionInfo
