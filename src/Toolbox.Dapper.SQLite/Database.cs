@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
@@ -125,7 +126,7 @@ namespace Toolbox.Dapper.SQLite
 			connection.Open();
 
 			var createScript = ExtractSchema(connection);
-			Connection.Execute(createScript);
+			var affected = Connection.Execute(createScript);
 
 			var version = new VersionInfo
 			{
@@ -164,10 +165,9 @@ namespace Toolbox.Dapper.SQLite
 			// -----------------------------------------------------------------
 			// PRAGMA settings
 			// -----------------------------------------------------------------
-
 			var foreignKeys = connection.ExecuteScalar<long>("PRAGMA foreign_keys;");
 			var userVersion = connection.ExecuteScalar<long>("PRAGMA user_version;");
-			var applicationId = connection.ExecuteScalar<long>(				"PRAGMA application_id;");
+			var applicationId = connection.ExecuteScalar<long>("PRAGMA application_id;");
 
 			script.AppendLine("PRAGMA foreign_keys = ON;");
 			script.AppendLine($"PRAGMA user_version = {userVersion};");
@@ -180,7 +180,6 @@ namespace Toolbox.Dapper.SQLite
 			// -----------------------------------------------------------------
 			// Tables
 			// -----------------------------------------------------------------
-
 			var tables = connection.Query<string>("""
             SELECT sql
             FROM sqlite_master
@@ -264,6 +263,11 @@ namespace Toolbox.Dapper.SQLite
 			}
 
 			script.AppendLine("COMMIT;");
+
+			Trace.WriteLine("EXTRACT SCHEMA");
+			Trace.WriteLine(script.ToString());
+			Trace.WriteLine("END SCHEMA");
+
 			return script.ToString();
 		}
 

@@ -21,7 +21,7 @@ namespace Toolbox.Dapper.SQLite.Test.Access
 
 			using var connection = GetConnection();
 
-			Trace.WriteLine("SCHEMA");
+			Trace.WriteLine("CURRENT SCHEMA");
 			var schema = connection.Query("SELECT * FROM sqlite_schema");
 			foreach (var row in schema)
 			{
