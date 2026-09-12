@@ -68,7 +68,6 @@ jobs:
       run: dotnet publish -c Release --no-build -o ..\..\publish -p:BuildVersion=${{ env.BUILD_VERSION }}.0
     
     # Documentation
-
     - name: Build Documentation
       working-directory: docfx_project
       run: docfx docfx.json
@@ -101,7 +100,7 @@ jobs:
     
     # Push the package
     - name: NuGet push
-      run: dotnet nuget push **\*.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./package/${{ env.PROJECT_NAME }}.${{ env.BUILD_VERSION }}.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
 
     # Upload the generated documentation as a GitHub Pages artifact
     - name: Create documentation artifact
