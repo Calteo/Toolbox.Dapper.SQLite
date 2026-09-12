@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Data;
 using Dapper;
 using Toolbox.Dapper.SQLite.Factories;
 
@@ -90,32 +90,32 @@ namespace Toolbox.Dapper.SQLite
 		}
 
 
-		public void Insert(T item)
+		public void Insert(T item, IDbTransaction? transaction = null)
 		{
 			var command = GetCommand(nameof(Insert))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Insert)}'.");
 
 			using var connection = Database.GetConnection(true);
-			var identity = connection.ExecuteScalar<long>(command, item);
+			var identity = connection.ExecuteScalar<long>(command, item, transaction);
 			item.Id = identity;
 		}
 
-		public void Update(T item)
+		public void Update(T item, IDbTransaction? transaction = null)
 		{
 			var command = GetCommand(nameof(Update))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Update)}'.");
 
 			using var connection = Database.GetConnection(true);
-			var affected = connection.Execute(command, item);
+			var affected = connection.Execute(command, item, transaction);
 		}
 
-		public void Delete(T item)
+		public void Delete(T item, IDbTransaction? transaction = null)
 		{
 			var command = GetCommand(nameof(Delete))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Delete)}'.");
 
 			using var connection = Database.GetConnection(true);
-			var affected = connection.Execute(command, item);
+			var affected = connection.Execute(command, item, transaction);
 		}
 	}
 }
