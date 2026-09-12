@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Toolbox.Dapper.SQLite.Test.Access;
 
@@ -9,13 +8,12 @@ namespace Toolbox.Dapper.SQLite.Test
 	public sealed class DatabaseTest
 	{
 		private string _databaseFile = "";
+		private TestDatabase? _database;
 
 		[TestInitialize]
 		public void Initialize()
 		{
 			_databaseFile = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.db");
-
-			var database = new TestDatabase(_databaseFile);
 
 			Trace.WriteLine($"Init database {_databaseFile}");
 		}
@@ -23,7 +21,9 @@ namespace Toolbox.Dapper.SQLite.Test
 		[TestCleanup]
 		public void Cleanup()
 		{
-			SqliteConnection.ClearAllPools();
+			var connection = new SqliteConnection($"Data Source={_databaseFile}");
+
+			SqliteConnection.ClearPool(connection);
 
 			if (File.Exists(_databaseFile))
 				File.Delete(_databaseFile);
@@ -65,8 +65,6 @@ namespace Toolbox.Dapper.SQLite.Test
 			cut.Close();
 			Assert.Throws<InvalidOperationException>(() => cut.Version);
 		}
-
-
 
 		[TestMethod]
 		public void InsertSelectUpdateDelete()

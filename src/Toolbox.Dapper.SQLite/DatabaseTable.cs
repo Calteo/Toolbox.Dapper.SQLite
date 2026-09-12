@@ -59,7 +59,7 @@ namespace Toolbox.Dapper.SQLite
 			command = GetType().TryGetRessourceString(name);
 			if (command != null)
 				Commands[key] = command;
-			else 
+			else
 			{
 				command = Factory.Call(name, TableName);
 			}
@@ -75,7 +75,7 @@ namespace Toolbox.Dapper.SQLite
 			using var connection = Database.GetConnection(true);
 			return connection.Query<T>(command);
 		}
-		
+
 		public IEnumerable<T> SelectWhere(string where, object? parameters = null)
 		{
 			var command = GetCommand(nameof(Select))
@@ -89,15 +89,21 @@ namespace Toolbox.Dapper.SQLite
 			return connection.Query<T>(command, parameters);
 		}
 
-
 		public void Insert(T item, IDbTransaction? transaction = null)
 		{
 			var command = GetCommand(nameof(Insert))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Insert)}'.");
 
-			using var connection = Database.GetConnection(true);
-			var identity = connection.ExecuteScalar<long>(command, item, transaction);
-			item.Id = identity;
+			var connection = transaction?.Connection ?? Database.GetConnection(true);
+			try
+			{
+				var identity = connection.ExecuteScalar<long>(command, item, transaction);
+				item.Id = identity;
+			}
+			finally
+			{
+				if (transaction is null) connection.Dispose();
+			}
 		}
 
 		public void Update(T item, IDbTransaction? transaction = null)
@@ -105,8 +111,15 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Update))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Update)}'.");
 
-			using var connection = Database.GetConnection(true);
-			var affected = connection.Execute(command, item, transaction);
+			var connection = transaction?.Connection ?? Database.GetConnection(true);
+			try
+			{
+				var affected = connection.Execute(command, item, transaction);
+			}
+			finally
+			{
+				if (transaction is null) connection.Dispose();
+			}
 		}
 
 		public void Delete(T item, IDbTransaction? transaction = null)
@@ -114,8 +127,15 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Delete))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Delete)}'.");
 
-			using var connection = Database.GetConnection(true);
-			var affected = connection.Execute(command, item, transaction);
+			var connection = transaction?.Connection ?? Database.GetConnection(true);
+			try
+			{
+				connection.Execute(command, item, transaction);
+			}
+			finally
+			{
+				if (transaction is null) connection.Dispose();
+			}
 		}
 	}
 }
