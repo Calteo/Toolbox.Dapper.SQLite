@@ -8,12 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Access\DemoDatabase.sql" />
     <None Remove="DemoDatabase.db" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Access\DemoDatabase.db" />
+    <EmbeddedResource Include="Access\DemoDatabase.sql" />
   </ItemGroup>
+
+  <!-- DemoDatabase.cs is included implicitly by the SDK's default Compile items -->
 
   <ItemGroup>
     <PackageReference Include="Toolbox.Core" Version="0.6.31" />

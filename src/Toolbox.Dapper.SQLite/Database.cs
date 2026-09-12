@@ -114,26 +114,9 @@ namespace Toolbox.Dapper.SQLite
 		/// </returns>
 		private VersionInfo Create()
 		{
-			using var stream = GetType().GetRessourceStream(GetType().Name + ".db");
-			var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}.db");
+			var createScript = GetType().GetRessourceString(GetType().Name + ".sql");
 
-			using (var file = File.Create(path))
-			{
-				Trace.WriteLine($"copy template database ({stream.Length} bytes) to {path}");
-				stream.CopyToAsync(file);
-				file.Flush();
-			}
-
-			using var connection = new SqliteConnection($"Data Source={path};Mode=ReadOnly;");
-			connection.Open();
-
-			var createScript = ExtractSchema(connection);
-
-			connection.Close();
-			SqliteConnection.ClearPool(connection);
-			File.Delete(path);
-
-			var affected = Connection.Execute(createScript);
+			Connection.Execute(createScript);
 
 			var version = new VersionInfo
 			{
@@ -163,126 +146,6 @@ namespace Toolbox.Dapper.SQLite
 		private void CreateVersionTable()
 		{
 			Connection.Execute("CREATE TABLE Version (Id INTEGER NOT NULL, ChangedAt TEXT NOT NULL, Comment TEXT NOT NULL, PRIMARY KEY(Id))");
-		}
-
-		private string ExtractSchema(SqliteConnection connection)
-		{
-			var script = new StringBuilder();
-
-			Trace.WriteLine("TEMPLATE SCHEMA");
-			var schema = connection.Query("SELECT * FROM sqlite_schema");
-			foreach (var row in schema)
-			{
-				Trace.WriteLine($"{row.type}/{row.name}/{row.tbl_name}");
-			}
-
-			// -----------------------------------------------------------------
-			// PRAGMA settings
-			// -----------------------------------------------------------------
-			var foreignKeys = connection.ExecuteScalar<long>("PRAGMA foreign_keys;");
-			var userVersion = connection.ExecuteScalar<long>("PRAGMA user_version;");
-			var applicationId = connection.ExecuteScalar<long>("PRAGMA application_id;");
-
-			script.AppendLine("PRAGMA foreign_keys = ON;");
-			script.AppendLine($"PRAGMA user_version = {userVersion};");
-			script.AppendLine($"PRAGMA application_id = {applicationId};");
-			script.AppendLine();
-
-			script.AppendLine("BEGIN TRANSACTION;");
-			script.AppendLine();
-
-			// -----------------------------------------------------------------
-			// Tables
-			// -----------------------------------------------------------------
-			var tables = connection.Query<string>("""
-            SELECT sql
-            FROM sqlite_master
-            WHERE type = 'table'
-              AND sql IS NOT NULL
-              AND name NOT LIKE 'sqlite_%'
-            ORDER BY name;
-            """);
-
-			script.AppendLine("-- Tables");
-			script.AppendLine();
-
-			foreach (var sql in tables)
-			{
-				script.AppendLine(sql.TrimEnd() + ";");
-				script.AppendLine();
-			}
-
-			// -----------------------------------------------------------------
-			// Indexes
-			// -----------------------------------------------------------------
-
-			var indexes = connection.Query<string>("""
-            SELECT sql
-            FROM sqlite_master
-            WHERE type = 'index'
-              AND sql IS NOT NULL
-              AND name NOT LIKE 'sqlite_%'
-            ORDER BY name;
-            """);
-
-			script.AppendLine("-- Indexes");
-			script.AppendLine();
-
-			foreach (var sql in indexes)
-			{
-				script.AppendLine(sql.TrimEnd() + ";");
-				script.AppendLine();
-			}
-
-			// -----------------------------------------------------------------
-			// Triggers
-			// -----------------------------------------------------------------
-
-			var triggers = connection.Query<string>("""
-            SELECT sql
-            FROM sqlite_master
-            WHERE type = 'trigger'
-              AND sql IS NOT NULL
-            ORDER BY name;
-            """);
-
-			script.AppendLine("-- Triggers");
-			script.AppendLine();
-
-			foreach (var sql in triggers)
-			{
-				script.AppendLine(sql.TrimEnd() + ";");
-				script.AppendLine();
-			}
-
-			// -----------------------------------------------------------------
-			// Views
-			// -----------------------------------------------------------------
-
-			var views = connection.Query<string>("""
-            SELECT sql
-            FROM sqlite_master
-            WHERE type = 'view'
-              AND sql IS NOT NULL
-            ORDER BY name;
-            """);
-
-			script.AppendLine("-- Views");
-			script.AppendLine();
-
-			foreach (var sql in views)
-			{
-				script.AppendLine(sql.TrimEnd() + ";");
-				script.AppendLine();
-			}
-
-			script.AppendLine("COMMIT;");
-			 
-			Trace.WriteLine($"EXTRACT SCHEMA from {connection.ConnectionString}");
-			Trace.WriteLine(script.ToString());
-			Trace.WriteLine("END SCHEMA");
-
-			return script.ToString();
 		}
 
 		private VersionInfo? Upgrade()

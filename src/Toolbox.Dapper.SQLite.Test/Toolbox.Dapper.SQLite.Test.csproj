@@ -9,15 +9,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Access\TestDatabase.sql" />
     <None Remove="Test.db" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Access\TestDatabase.db" />
+    <EmbeddedResource Include="Access\TestDatabase.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Toolbox.Dapper.SQLite\Toolbox.Dapper.SQLite.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="MSTest.TestAdapter" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="MSTest.TestFramework" Version="4.4.0" />
   </ItemGroup>
 
 </Project>

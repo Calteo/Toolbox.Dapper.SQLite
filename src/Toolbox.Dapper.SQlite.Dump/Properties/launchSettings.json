@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "DemoDatabase": {
+      "commandName": "Project",
+      "commandLineArgs": "..\\..\\..\\Test\\Demo.db ..\\..\\..\\Test\\Demo.sql"
+    }
+  }
+}

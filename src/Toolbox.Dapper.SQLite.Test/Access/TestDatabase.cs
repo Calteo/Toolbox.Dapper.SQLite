@@ -27,7 +27,6 @@ namespace Toolbox.Dapper.SQLite.Test.Access
 			{
 				Trace.WriteLine($"{row.type}/{row.name}/{row.tbl_name}");
 			}
-
 		}
 	}
 }
