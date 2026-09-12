@@ -47,6 +47,8 @@ namespace Toolbox.Dapper.SQLite
 		/// This property is required and must be initialized when creating an instance of the DatabaseTable class.
 		/// </summary>
 		public required Database Database { get; init; }
+		protected IDbConnection GetConnection() => Database.GetConnection();
+
 		protected SqlFactory<T> Factory { get; set; } = new SqliteFactory<T>();
 
 		private Dictionary<string, string> Commands { get; } = [];
@@ -72,7 +74,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Select))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Select)}'.");
 
-			using var connection = Database.GetConnection();
+			using var connection = GetConnection();
 			return connection.Query<T>(command);
 		}
 
@@ -85,7 +87,7 @@ namespace Toolbox.Dapper.SQLite
 
 			command += " WHERE " + clause;
 
-			using var connection = Database.GetConnection();
+			using var connection = GetConnection();
 			return connection.Query<T>(command, parameters);
 		}
 
@@ -94,7 +96,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Insert))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Insert)}'.");
 
-			var connection = transaction?.Connection ?? Database.GetConnection();
+			var connection = transaction?.Connection ?? GetConnection();
 			try
 			{
 				var identity = connection.ExecuteScalar<long>(command, item, transaction);
@@ -111,7 +113,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Update))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Update)}'.");
 
-			var connection = transaction?.Connection ?? Database.GetConnection();
+			var connection = transaction?.Connection ?? GetConnection();
 			try
 			{
 				var affected = connection.Execute(command, item, transaction);
@@ -127,7 +129,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Delete))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Delete)}'.");
 
-			var connection = transaction?.Connection ?? Database.GetConnection();
+			var connection = transaction?.Connection ?? GetConnection();
 			try
 			{
 				connection.Execute(command, item, transaction);
