@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Xml.Linq;
 using Dapper;
 
 namespace Toolbox.Dapper.SQLite.Test.Access
@@ -27,6 +28,21 @@ namespace Toolbox.Dapper.SQLite.Test.Access
 			{
 				Trace.WriteLine($"{row.type}/{row.name}/{row.tbl_name}");
 			}
+		}
+
+		public void BulkInsertPeople(int count, bool rollback = false)
+		{
+			using var connection = GetConnection();
+			using var transaction = connection.BeginTransaction();
+
+			for (int i = 0; i < count; i++)
+			{
+				var p = new People { Name = $"Bulk#{i+1}", Age = 21+i };
+				Peoples.Insert(p, transaction);
+			}
+
+			if (rollback) transaction.Rollback();
+			else transaction.Commit();
 		}
 	}
 }

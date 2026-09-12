@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Data;
+using System.Diagnostics;
 using System.Text;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -17,7 +18,7 @@ namespace Toolbox.Dapper.SQLite
 		public Database(string filename)
 		{
 			Filename = filename;
-			Connection = GetConnection();
+			Connection = new SqliteConnection($"Data Source={Filename}");
 		}
 
 		/// <summary>
@@ -37,10 +38,10 @@ namespace Toolbox.Dapper.SQLite
 		/// </summary>
 		/// <param name="open"></param>
 		/// <returns></returns>
-		protected internal SqliteConnection GetConnection(bool open = false)
+		protected internal IDbConnection GetConnection()
 		{
 			var connection = new SqliteConnection($"Data Source={Filename}");
-			if (open) connection.Open(); 
+			connection.Open(); 			
 			return connection;
 		}
 

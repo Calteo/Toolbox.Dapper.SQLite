@@ -72,7 +72,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Select))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Select)}'.");
 
-			using var connection = Database.GetConnection(true);
+			using var connection = Database.GetConnection();
 			return connection.Query<T>(command);
 		}
 
@@ -85,7 +85,7 @@ namespace Toolbox.Dapper.SQLite
 
 			command += " WHERE " + clause;
 
-			using var connection = Database.GetConnection(true);
+			using var connection = Database.GetConnection();
 			return connection.Query<T>(command, parameters);
 		}
 
@@ -94,7 +94,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Insert))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Insert)}'.");
 
-			var connection = transaction?.Connection ?? Database.GetConnection(true);
+			var connection = transaction?.Connection ?? Database.GetConnection();
 			try
 			{
 				var identity = connection.ExecuteScalar<long>(command, item, transaction);
@@ -111,7 +111,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Update))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Update)}'.");
 
-			var connection = transaction?.Connection ?? Database.GetConnection(true);
+			var connection = transaction?.Connection ?? Database.GetConnection();
 			try
 			{
 				var affected = connection.Execute(command, item, transaction);
@@ -127,7 +127,7 @@ namespace Toolbox.Dapper.SQLite
 			var command = GetCommand(nameof(Delete))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Delete)}'.");
 
-			var connection = transaction?.Connection ?? Database.GetConnection(true);
+			var connection = transaction?.Connection ?? Database.GetConnection();
 			try
 			{
 				connection.Execute(command, item, transaction);

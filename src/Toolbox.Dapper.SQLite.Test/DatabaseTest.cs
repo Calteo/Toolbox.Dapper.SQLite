@@ -8,7 +8,6 @@ namespace Toolbox.Dapper.SQLite.Test
 	public sealed class DatabaseTest
 	{
 		private string _databaseFile = "";
-		private TestDatabase? _database;
 
 		[TestInitialize]
 		public void Initialize()
@@ -33,7 +32,7 @@ namespace Toolbox.Dapper.SQLite.Test
 		public void OpenCloseDatabase()
 		{
 			using var cut = new TestDatabase(_databaseFile);
-			
+
 			cut.Open();
 
 			Trace.WriteLine($"Version: {cut.Version.Id} - {cut.Version.Comment} at {cut.Version.ChangedAt}");
@@ -114,6 +113,38 @@ namespace Toolbox.Dapper.SQLite.Test
 			// VERIFY
 			var all = cut.Peoples.Select();
 			Assert.HasCount(0, all);
+		}
+
+		[TestMethod]
+		public void InsertWithTransaction()
+		{
+			using var cut = new TestDatabase(_databaseFile);
+			cut.Open();
+
+			const int count = 10;
+
+			// INSERT with transaction
+			cut.BulkInsertPeople(count);
+
+			var inserted = cut.Peoples.Select();
+
+			Assert.HasCount(count, inserted);
+		}
+
+		[TestMethod]
+		public void InsertWithTransactionWithRollback()
+		{
+			using var cut = new TestDatabase(_databaseFile);
+			cut.Open();
+
+			const int count = 10;
+
+			// INSERT with transaction
+			cut.BulkInsertPeople(count, true);
+
+			var inserted = cut.Peoples.Select();
+
+			Assert.HasCount(0, inserted);
 		}
 	}
 }
