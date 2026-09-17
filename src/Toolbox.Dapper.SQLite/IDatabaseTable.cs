@@ -1,8 +1,5 @@
 ﻿namespace Toolbox.Dapper.SQLite
 {
-	/// <summary>
-	/// Interface for database tables. This interface can be implemented by classes that represent specific database tables.
-	/// </summary>
 	public interface IDatabaseTable
 	{
 		/// <summary>
@@ -10,9 +7,6 @@
 		/// </summary>
 		/// <returns></returns>
 		Type GetModelType();
-
-		Database Database { get; init; }
-
 		/// <summary>
 		/// Called when the database is opened.
 		/// </summary>
@@ -21,5 +15,16 @@
 		/// Called when the database is closed.
 		/// </summary>
 		void Close();
+	}
+
+	/// <summary>
+	/// Interface for database tables. This interface can be implemented by classes that represent specific database tables.
+	/// </summary>
+	public interface IDatabaseTable<TD> : IDatabaseTable where TD : Database
+	{
+		/// <summary>
+		/// Get the <see cref="Database"/> of a table.
+		/// </summary>
+		TD Database { get; init; }
 	}
 }

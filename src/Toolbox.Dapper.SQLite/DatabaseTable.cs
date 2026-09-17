@@ -7,7 +7,7 @@ namespace Toolbox.Dapper.SQLite
 	/// <summary>
 	/// Represents a database table. This class can be extended to define specific tables and their properties.
 	/// </summary>
-	public partial class DatabaseTable<T> : IDatabaseTable where T : IDatabaseModel
+	public partial class DatabaseTable<TD, TM> : IDatabaseTable<TD> where TM : IDatabaseModel where TD : Database
 	{
 		/// <summary>
 		/// Create a new instance of the <see cref="DatabaseTable{T}"/> class with the specified table name.
@@ -17,6 +17,11 @@ namespace Toolbox.Dapper.SQLite
 		{
 			TableName = tableName;
 		}
+
+		/// <summary>
+		/// The database containing this table
+		/// </summary>
+		public required TD Database { get; init; }
 
 		/// <summary>
 		/// Name of the database table. This property is initialized through the constructor and is read-only.
@@ -30,7 +35,7 @@ namespace Toolbox.Dapper.SQLite
 		/// Get the type of the model associated with this database table. 
 		/// </summary>
 		/// <returns></returns>
-		public Type GetModelType() => typeof(T);
+		public Type GetModelType() => typeof(TM);
 
 		/// <inheritdoc />
 		public virtual void Open()
@@ -42,14 +47,9 @@ namespace Toolbox.Dapper.SQLite
 		{
 		}
 
-		/// <summary>
-		/// The database instance associated with this table. 
-		/// This property is required and must be initialized when creating an instance of the DatabaseTable class.
-		/// </summary>
-		public required Database Database { get; init; }
 		protected IDbConnection GetConnection() => Database.GetConnection();
 
-		protected SqlFactory<T> Factory { get; set; } = new SqliteFactory<T>();
+		protected SqlFactory<TM> Factory { get; set; } = new SqliteFactory<TM>();
 
 		private Dictionary<string, string> Commands { get; } = [];
 
@@ -69,16 +69,16 @@ namespace Toolbox.Dapper.SQLite
 			return command;
 		}
 
-		public IEnumerable<T> Select()
+		public IEnumerable<TM> Select()
 		{
 			var command = GetCommand(nameof(Select))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Select)}'.");
 
 			using var connection = GetConnection();
-			return connection.Query<T>(command);
+			return connection.Query<TM>(command);
 		}
 
-		public IEnumerable<T> SelectWhere(string where, object? parameters = null)
+		public IEnumerable<TM> SelectWhere(string where, object? parameters = null)
 		{
 			var command = GetCommand(nameof(Select))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Select)}'.");
@@ -88,10 +88,10 @@ namespace Toolbox.Dapper.SQLite
 			command += " WHERE " + clause;
 
 			using var connection = GetConnection();
-			return connection.Query<T>(command, parameters);
+			return connection.Query<TM>(command, parameters);
 		}
 
-		public void Insert(T item, IDbTransaction? transaction = null)
+		public void Insert(TM item, IDbTransaction? transaction = null)
 		{
 			var command = GetCommand(nameof(Insert))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Insert)}'.");
@@ -108,7 +108,7 @@ namespace Toolbox.Dapper.SQLite
 			}
 		}
 
-		public void Update(T item, IDbTransaction? transaction = null)
+		public void Update(TM item, IDbTransaction? transaction = null)
 		{
 			var command = GetCommand(nameof(Update))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Update)}'.");
@@ -124,7 +124,7 @@ namespace Toolbox.Dapper.SQLite
 			}
 		}
 
-		public void Delete(T item, IDbTransaction? transaction = null)
+		public void Delete(TM item, IDbTransaction? transaction = null)
 		{
 			var command = GetCommand(nameof(Delete))
 				?? throw new InvalidOperationException($"No command found for '{nameof(Delete)}'.");

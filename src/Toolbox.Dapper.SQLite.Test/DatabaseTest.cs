@@ -40,6 +40,7 @@ namespace Toolbox.Dapper.SQLite.Test
 			Assert.IsNotNull(cut.Version);
 			Assert.AreEqual(1, cut.Version.Id);
 			Assert.IsTrue(cut.CreateCalled);
+			Assert.AreSame(cut, cut.Peoples.Database);
 
 			cut.Close();
 			Assert.Throws<InvalidOperationException>(() => cut.Version);

@@ -2,7 +2,7 @@
 
 namespace Toolbox.Dapper.SQLite.Demo.Access.People
 {
-	internal class PeopleTable() : DatabaseTable<Person>("People")
+	internal class PeopleTable() : DatabaseTable<DemoDatabase, Person>("People")
 	{
 	}
 }

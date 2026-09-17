@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -64,7 +65,7 @@ namespace Toolbox.Dapper.SQLite
 				table = Activator.CreateInstance<T>()
 					?? throw new ArgumentNullException(nameof(table));
 			
-			table.GetType().GetProperty(nameof(IDatabaseTable.Database))!.SetValue(table, this);
+			table.GetType().GetProperty(nameof(IDatabaseTable<Database>.Database))!.SetValue(table, this);
 
 			var modelType = table.GetModelType();
 			_tables[modelType] = table;
