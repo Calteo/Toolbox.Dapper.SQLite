@@ -4,8 +4,16 @@ using Toolbox.Dapper.SQLite.Attributes;
 
 namespace Toolbox.Dapper.SQLite.Factories
 {
+	/// <summary>
+	/// Generic SQL statement factory
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public abstract partial class SqlFactory<T> where T : IDatabaseModel
 	{
+		/// <summary>
+		/// Create a new instance of the <see cref="SqlFactory{T}"/> class.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"></exception>
 		public SqlFactory()
 		{
 			Mappings = GetProperties().Select(p => new ColumnMapping(p)).ToDictionary(m => m.PropertyName);
@@ -41,6 +49,11 @@ namespace Toolbox.Dapper.SQLite.Factories
 
 		protected virtual string Quote(string name) => name;
 
+		/// <summary>
+		/// Replaces properties with their column names.
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <returns></returns>
 		public string ReplaceProperties(string expression)
 		{
 			return ReplacePropertiesRegex().Replace(expression, ReplaceProperty);
@@ -55,16 +68,43 @@ namespace Toolbox.Dapper.SQLite.Factories
 			return Quote(mapping.ColumnName);
 		}
 
+		/// <summary>
+		/// Creates a SELECT statement with further clauses
+		/// </summary>
+		/// <param name="tableName"></param>
+		/// <returns></returns>
 		abstract public string Select(string tableName);
+		/// <summary>
+		/// Creates an INSERT statement for a single <see cref="DatabaseModel"/>.
+		/// </summary>
+		/// <param name="tableName"></param>
+		/// <returns></returns>
 		abstract public string Insert(string tableName);
+		/// <summary>
+		/// Creates an UPDATE statement for a single <see cref="DatabaseModel"/>.
+		/// </summary>
+		/// <param name="tableName"></param>
+		/// <returns></returns>
 		abstract public string Update(string tableName);
+		/// <summary>
+		/// Creates an DELETE statement for a single <see cref="DatabaseModel"/>.
+		/// </summary>
+		/// <param name="tableName"></param>
+		/// <returns></returns>
 		abstract public string Delete(string tableName);
+		/// <summary>
+		/// Creates an DELETE statement without WHERE clause.
+		/// </summary>
+		/// <param name="tableName"></param>
+		/// <returns></returns>
+		/// <remarks>The <see cref="DatabaseTable{TD, TM}.DeleteWhere"/> uses this to attach a custom WHERE clause.</remarks>
+		abstract public string DeleteWhere(string tableName);
 
 		internal string? Call(string name, string tableName)
 		{
 			if (Methods.TryGetValue(name, out var method))
 			{
-				return (string?)method.Invoke(this, new object?[] { tableName });
+				return (string?)method.Invoke(this, [tableName]);
 			}
 			return null;
 		}

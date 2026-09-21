@@ -105,7 +105,7 @@ jobs:
     # Upload the generated documentation as a GitHub Pages artifact
     - name: Create documentation artifact
       if: github.event_name == 'push'
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v5
       with:
         path: docfx_project/docs
 
@@ -113,4 +113,4 @@ jobs:
     - name: Deploy documentation artifact to GitHub Pages
       if: github.event_name == 'push'
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5

@@ -58,6 +58,11 @@ namespace Toolbox.Dapper.SQLite.Factories
 			return builder.ToString();
 		}
 
+		public override string DeleteWhere(string tableName)
+		{
+			return $"DELETE FROM {Quote(tableName)}";
+		}
+
 		private void AppendWhereIdentityOrKeys(StringBuilder builder)
 		{
 			if (Identity != null)

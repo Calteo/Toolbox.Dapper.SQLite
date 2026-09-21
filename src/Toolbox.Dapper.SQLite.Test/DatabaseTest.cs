@@ -117,6 +117,39 @@ namespace Toolbox.Dapper.SQLite.Test
 		}
 
 		[TestMethod]
+		public void DeleteAll()
+		{
+			using var cut = new TestDatabase(_databaseFile);
+			cut.Open();
+
+			const int count = 10;
+			cut.BulkInsertPeople(count);
+
+			cut.Peoples.DeleteWhere(""); // delete all
+
+			var exisiting = cut.Peoples.Select();
+
+			Assert.HasCount(0, exisiting);
+		}
+
+		[TestMethod]
+		public void DeleteWithWhereClause()
+		{
+			using var cut = new TestDatabase(_databaseFile);
+			cut.Open();
+
+			const int count = 10;
+			cut.BulkInsertPeople(count);
+
+			cut.Peoples.DeleteWhere("[Age]>25"); 
+
+			var exisiting = cut.Peoples.Select();
+
+			Assert.HasCount(5, exisiting);
+		}
+
+
+		[TestMethod]
 		public void InsertWithTransaction()
 		{
 			using var cut = new TestDatabase(_databaseFile);

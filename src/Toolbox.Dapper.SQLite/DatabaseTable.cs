@@ -139,5 +139,28 @@ namespace Toolbox.Dapper.SQLite
 				if (transaction is null) connection.Dispose();
 			}
 		}
+
+		public void DeleteWhere(string where, IDbTransaction? transaction = null)
+		{
+			var command = GetCommand(nameof(DeleteWhere))
+				?? throw new InvalidOperationException($"No command found for '{nameof(DeleteWhere)}'.");
+
+			if (!string.IsNullOrWhiteSpace(where))
+			{
+				var clause = Factory.ReplaceProperties(where);
+				command += " WHERE " + clause;
+			}
+
+			var connection = transaction?.Connection ?? GetConnection();
+			try
+			{
+				connection.Execute(command, transaction);
+			}
+			finally
+			{
+				if (transaction is null) connection.Dispose();
+			}
+		}
+
 	}
 }
