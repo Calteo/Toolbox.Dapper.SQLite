@@ -55,10 +55,10 @@ namespace Toolbox.Dapper.SQLite
 
 		protected string? GetCommand(string name)
 		{
-			var key = $"{TableName}_{name}.sql";
+			var key = $"{GetType().Name}_{name}.sql";
 			if (Commands.TryGetValue(key, out var command)) return command;
 
-			command = GetType().TryGetRessourceString(name);
+			command = GetType().TryGetRessourceString(key);
 			if (command != null)
 				Commands[key] = command;
 			else

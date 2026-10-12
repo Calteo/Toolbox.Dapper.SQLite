@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Dapper;
 
 namespace Toolbox.Dapper.SQLite.Test.Access
 {
@@ -8,6 +6,14 @@ namespace Toolbox.Dapper.SQLite.Test.Access
 	{
 		public PeopleTable() : base("People")
 		{
+		}
+
+		public People? SelectHugo()
+		{
+			var sql = GetCommand("SelectHugo");
+			if (string.IsNullOrEmpty(sql)) throw new InvalidOperationException("Command SelectHugo not found");
+
+			return GetConnection().QuerySingleOrDefault<People>(sql);
 		}
 	}
 }

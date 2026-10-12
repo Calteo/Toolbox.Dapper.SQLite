@@ -24,8 +24,14 @@ namespace Toolbox.Dapper.SQLite.Test
 
 			SqliteConnection.ClearPool(connection);
 
-			if (File.Exists(_databaseFile))
-				File.Delete(_databaseFile);
+			try
+			{
+				if (File.Exists(_databaseFile))
+					File.Delete(_databaseFile);
+			}
+			catch
+			{
+			}
 		}
 
 		[TestMethod]
@@ -64,6 +70,30 @@ namespace Toolbox.Dapper.SQLite.Test
 
 			cut.Close();
 			Assert.Throws<InvalidOperationException>(() => cut.Version);
+		}
+
+		[TestMethod]
+		public void CustomSelect()
+		{
+			using var cut = new TestDatabase(_databaseFile);
+			cut.Open();
+
+			const string Name = "Hugo";
+			const int Age = 1;
+			const string Comment = "Some Comment";
+			const int Dummy = 959;
+
+			// INSERT
+			var p = new People { Name = Name, Age = Age, Comment = Comment, Dummy = Dummy };
+			cut.Peoples.Insert(p);
+
+			// CUSTOM SELECT
+			var hugo = cut.Peoples.SelectHugo();
+
+			Assert.IsNotNull(hugo);
+			Assert.AreEqual(Name, hugo.Name);
+			Assert.AreEqual(Age, hugo.Age);
+			Assert.AreEqual(Comment, hugo.Comment);
 		}
 
 		[TestMethod]

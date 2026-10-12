@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Xml.Linq;
 using Dapper;
 
 namespace Toolbox.Dapper.SQLite.Test.Access
